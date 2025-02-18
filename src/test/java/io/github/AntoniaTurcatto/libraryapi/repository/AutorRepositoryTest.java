@@ -1,11 +1,16 @@
 package io.github.AntoniaTurcatto.libraryapi.repository;
 
 import io.github.AntoniaTurcatto.libraryapi.config.model.Autor;
+import io.github.AntoniaTurcatto.libraryapi.config.model.GeneroLivro;
+import io.github.AntoniaTurcatto.libraryapi.config.model.Livro;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,6 +20,9 @@ public class AutorRepositoryTest {
 
     @Autowired
     AutorRepository autorRepository;
+
+    @Autowired
+    LivroRepository livroRepository;
 
 //     public AutorRepositoryTest(AutorRepository autorRepository){
 //         this.autorRepository = autorRepository;
@@ -70,6 +78,57 @@ public class AutorRepositoryTest {
         var maria = autorRepository.findById(id).get();
 
         autorRepository.delete(maria);
+    }
+
+    @Test
+    void salvarAutorComLivroTest(){
+        Autor autor = new Autor();
+        autor.setNome("Antônio");
+        autor.setNacionalidade("Brasileira");
+        autor.setDataNascimento(LocalDate.of(1971,6,11));
+
+        Livro livro = new Livro();
+        livro.setIsbn("101010");
+        livro.setPreco(BigDecimal.valueOf(1080));
+        livro.setGenero(GeneroLivro.BIOGRAFIA);
+        livro.setTitulo("Rogerio");
+        livro.setDataPublicacao(LocalDate.of(1990,11,3));
+
+        Livro livro2 = new Livro();
+        livro2.setIsbn("132");
+        livro2.setPreco(BigDecimal.valueOf(80));
+        livro2.setGenero(GeneroLivro.CIENCIA);
+        livro2.setTitulo("Ciensando");
+        livro2.setDataPublicacao(LocalDate.of(1890,11,3));
+
+        autor.setLivros(new ArrayList<>());
+        autor.getLivros().add(livro);
+        autor.getLivros().add(livro2);
+
+        autorRepository.save(autor);
+
+        for (Livro l : autor.getLivros()) {
+            l.setAutor(autor);
+        }
+
+        livroRepository.saveAll(autor.getLivros());
+    }
+
+    @Test
+    //@Transactional
+    void listarLivrosAutor(){
+        var autor = autorRepository.findById(UUID.fromString("c8353b47-8134-41c8-a9d0-bb72a91f4cd4"));
+        //como é lazy por padrão o OneToMany, ele não carrega a lista junto
+        //para isso, deve colocar @Transactional ou criar uma query no repository com join
+
+
+        //com Query Method (opção ideal sem o @Transactional):
+        autor.get().setLivros(livroRepository.findByAutor(autor.get()));
+
+        for (Livro livro : autor.get().getLivros()) {
+            System.out.println(livro.toString());
+        }
+
     }
 }
 

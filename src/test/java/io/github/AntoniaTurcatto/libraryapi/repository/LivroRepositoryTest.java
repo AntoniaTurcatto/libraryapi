@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest
@@ -97,4 +98,76 @@ class LivroRepositoryTest {
         System.out.println("    Autor: "+ livro.getAutor().getNome());
         System.out.println();
     }
+
+    @Test
+    void pesquisaPorTituloTest(){
+        List<Livro> lista = livroRepository.findByTitulo("Ciensando");
+        for(Livro l : lista){
+            System.out.println(l);
+        }
+    }
+
+    @Test
+    void pesquisaPorTituloEPrecoTest(){
+        List<Livro> lista = livroRepository.findByTituloAndPreco("Ciensando", BigDecimal.valueOf(80));
+        for(Livro l : lista){
+            System.out.println(l);
+        }
+    }
+
+    @Test
+    void pesquisaPorTituloOuPrecoTest(){
+        List<Livro> lista = livroRepository.findByTituloOrPreco("dadsasdas", BigDecimal.valueOf(80));
+        for(Livro l : lista){
+            System.out.println(l);
+        }
+    }
+
+    @Test
+    void listarLivrosComQueryJpql(){
+        var resultado = livroRepository.listarTodosOrdenadoPorTipoAndPreco();
+        resultado.forEach(System.out::println);
+    }
+
+    @Test
+    void listarAutoresDosLivros(){
+        var resultado = livroRepository.listarAutoresDosLivros();
+        resultado.forEach(System.out::println);
+    }
+
+    @Test
+    void listarNomesDeLivrosDiferentes(){
+        var resultado = livroRepository.listarNomesDiferentesLivros();
+        resultado.forEach(System.out::println);
+    }
+
+    @Test
+    void listarGenerosDeLivrosAutoresBrasileiros(){
+        var resultado = livroRepository.listarGenerosAutoresBrasileiros();
+        resultado.forEach(System.out::println);
+    }
+
+    @Test
+    void listarPorGeneroQueryParam(){
+        var resultado = livroRepository.findByGenero(GeneroLivro.CIENCIA, "dataPublicacao");
+        resultado.forEach(System.out::println);
+    }
+
+    @Test
+    void listarPorGeneroPositionalParam(){
+        var resultado = livroRepository.findByGenero(GeneroLivro.CIENCIA, "dataPublicacao");
+        resultado.forEach(System.out::println);
+    }
+    @Test
+    void deletePorGeneroTest(){
+        livroRepository.deleteByGenero(GeneroLivro.FICCAO);
+    }
+
+    @Test
+    void updateDataPublicacaoTest(){
+        livroRepository.updateDataPublicacao(LocalDate.of(2000,1,1));
+    }
+
+
+
 }

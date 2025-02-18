@@ -2,6 +2,7 @@ package io.github.AntoniaTurcatto.libraryapi.config.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Table(name = "livro")
 @Data //incorpora @Getter e @Setter e demais annotations do Lomnbok,
 // como @ToString @EqualsAndHashCode e @RequiredArgsConstructor
+@ToString(exclude = "autor")
 public class Livro {
 
     @Id
@@ -35,7 +37,7 @@ public class Livro {
     private BigDecimal preco;
 
     @ManyToOne(fetch = FetchType.LAZY)//muitos livros para um autor
-    @JoinColumn(name = "id_autor")
+    @JoinColumn(name = "id_autor") //define a foreign key
     private Autor autor;
 
 

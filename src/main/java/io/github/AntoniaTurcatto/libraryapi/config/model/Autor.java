@@ -13,7 +13,7 @@ import java.util.UUID;
 @Table(name = "autor", schema = "public") //nome da tabela e schema, se for public não precisa explicitá-lo
 @Getter//gera os getters e setters em compile time
 @Setter
-@ToString
+@ToString(exclude = "livros")
 public class Autor {
 
     @Id
@@ -30,7 +30,6 @@ public class Autor {
     @Column(name = "nacionalidade", length = 50, nullable = false)
     private String nacionalidade;
 
-    //@OneToMany(mappedBy = "autor")//mappedBy: qual é o nome dessa propriedade de autor na entidade de livros
-    @Transient//não é coluna
+    @OneToMany(mappedBy = "autor")//mappedBy: qual é o nome dessa propriedade de autor na entidade de livros
     private List<Livro> livros;//um autor para muitos livros
 }
