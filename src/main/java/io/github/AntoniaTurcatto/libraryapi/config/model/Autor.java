@@ -4,8 +4,12 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +18,9 @@ import java.util.UUID;
 @Getter//gera os getters e setters em compile time
 @Setter
 @ToString(exclude = "livros")
+@EntityListeners(AuditingEntityListener.class)//vai ficar escutando toda vez que tiver
+// uma alteração na entidade e fazer as alterações do @CreatedDate e @LastModifiedDate
+//isso funciona com @EnableJpaAuditing ativado na classe Application
 public class Autor {
 
     @Id
@@ -32,4 +39,15 @@ public class Autor {
 
     @OneToMany(mappedBy = "autor")//mappedBy: qual é o nome dessa propriedade de autor na entidade de livros
     private List<Livro> livros;//um autor para muitos livros
+
+    @CreatedDate
+    @Column(name = "data_cadastro")
+    private LocalDateTime dataCadastro;
+
+    @LastModifiedDate
+    @Column(name = "data_atualizacao")
+    private LocalDateTime dataAtualizacao;
+
+    @Column(name = "id_usuario")
+    private UUID idUsuario;
 }
