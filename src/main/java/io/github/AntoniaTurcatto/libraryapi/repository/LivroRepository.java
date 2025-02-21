@@ -16,6 +16,8 @@ import java.util.UUID;
 
 public interface LivroRepository extends JpaRepository<Livro, UUID> {
 
+    boolean existsByAutor(Autor autor);
+
     //Query Method
     //vai buscar o mapeamento (ORM) da entidade na classe livro e fazer o select
     List<Livro> findByAutor(Autor autor); //findBy + Campo da propriedade na classe
