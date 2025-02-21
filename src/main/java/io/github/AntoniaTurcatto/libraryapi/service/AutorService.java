@@ -5,6 +5,8 @@ import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaExcep
 import io.github.AntoniaTurcatto.libraryapi.repository.AutorRepository;
 import io.github.AntoniaTurcatto.libraryapi.repository.LivroRepository;
 import io.github.AntoniaTurcatto.libraryapi.validator.AutorValidator;
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.ExampleMatcher;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -55,8 +57,6 @@ public class AutorService {
         } else {
             return autorRepository.findAll();
         }
-
-
     }
 
     public void atualizar(Autor autor){
@@ -69,5 +69,21 @@ public class AutorService {
 
     public boolean possuiLivro(Autor autor){
         return livroRepository.existsByAutor(autor);
+    }
+
+    public List<Autor> pesquisaByExample(String nome, String nacionalidade){
+        Autor autor = new Autor();
+        autor.setNome(nome);
+        autor.setNacionalidade(nacionalidade);
+        ExampleMatcher exampleMatcher = ExampleMatcher
+                .matching() //adicionando filtros para ignorar alguns casos
+                .withIgnoreNullValues()
+                .withIgnoreCase()
+                //.withIgnorePaths("id", "dataNascimento") //para ignorar esses campos do autor, caso eu tivesse recebido o autor no métoodo
+                //forma que ele vai usar para fazer o match dos dados
+                .withStringMatcher(ExampleMatcher.StringMatcher.CONTAINING);//começa, termina ou qualquer parte do texto tem aquela String (semelhante aos usos do LIKE)
+        Example<Autor> autorExample = Example.of(autor, exampleMatcher);
+
+        return autorRepository.findAll(autorExample);
     }
 }

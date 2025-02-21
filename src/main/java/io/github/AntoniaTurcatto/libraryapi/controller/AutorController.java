@@ -6,8 +6,7 @@ import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroRespostaDTO;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.RegistroDuplicadoException;
 import io.github.AntoniaTurcatto.libraryapi.service.AutorService;
-import jakarta.websocket.server.PathParam;
-import org.springframework.http.HttpStatus;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -16,7 +15,6 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/autores")
@@ -29,8 +27,8 @@ public class AutorController {
         this.autorService = autorService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> salvar(@RequestBody AutorDTO autorDTO){//? = coringa/wildcard
+    @PostMapping //@Valid = testa as anotações de validação do AutorDTO
+    public ResponseEntity<?> salvar(@RequestBody @Valid AutorDTO autorDTO){//? = coringa/wildcard
         try {
             var autorEntidade = autorDTO.mapearParaAutor();
             autorService.salvar(autorEntidade);
@@ -84,7 +82,7 @@ public class AutorController {
     @GetMapping//UTILIZA O VALUE PORQUE NÃO É REQUIRED E TEM MAIS DE 1
     public ResponseEntity<List<AutorDTO>> pesquisar(@RequestParam(value = "nome", required = false) String nome,
                                                     @RequestParam(value = "nacionalidade", required = false) String nacionalidade){
-         List<Autor> listAutor = autorService.pesquisa(nome, nacionalidade);
+         List<Autor> listAutor = autorService.pesquisaByExample(nome, nacionalidade);
          List<AutorDTO> listDto = listAutor.stream().map(autor ->
              new AutorDTO(autor.getId(),
                  autor.getNome(),
@@ -98,7 +96,7 @@ public class AutorController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable("id") String id,
-                                          @RequestBody AutorDTO dto){
+                                          @RequestBody @Valid AutorDTO dto){
         try{
             var idAutor = UUID.fromString(id);
             Optional<Autor> autorOp = autorService.obterPorId(idAutor);
