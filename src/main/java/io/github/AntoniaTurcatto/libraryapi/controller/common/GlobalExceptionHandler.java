@@ -2,6 +2,8 @@ package io.github.AntoniaTurcatto.libraryapi.controller.common;
 
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroCampo;
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroRespostaDTO;
+import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
+import io.github.AntoniaTurcatto.libraryapi.exceptions.RegistroDuplicadoException;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.util.List;
 
 @RestControllerAdvice //capturar exceptions e retornar response
+//serve para não poluir o código com try-catchs repetidos
 public class GlobalExceptionHandler {
 
     //retornar o que queremos na resposta da exceção
@@ -29,4 +32,23 @@ public class GlobalExceptionHandler {
                 listErrors);
     }
 
+    @ExceptionHandler(RegistroDuplicadoException.class)//erro a ser tratado
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ErroRespostaDTO handleRegistroDuplicadoException(RegistroDuplicadoException e){
+        return ErroRespostaDTO.conflito(e.getMessage());
+    }
+
+    @ExceptionHandler(OperacaoNaoPermitidaException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErroRespostaDTO handleOperacaoNaoPermitidaException(OperacaoNaoPermitidaException e){
+        return ErroRespostaDTO.respostaPadrao(e.getMessage());
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErroRespostaDTO handleErrosNaoTratados(RuntimeException e){
+        return new ErroRespostaDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                "Ocorreu um erro inesperado. Entre em contato com a administração do sistema.",
+                List.of());
+    }
 }
