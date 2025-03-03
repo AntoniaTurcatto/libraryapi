@@ -38,12 +38,6 @@ public class LivroService {
                                 GeneroLivro genero,
                                 Integer anoDePublicacao){
 
-        //select * from livro where isbn = :isbn and nomeAutor = ....
-//        Specification<Livro> specs = Specification.
-//                where(LivroSpecs.isbnEqual(isbn))
-//                .and(LivroSpecs.tituloLike(titulo))
-//                .and(LivroSpecs.generoEqual(genero))
-//                ;
         //root = dados que eu quero da query
         //query = obj do criqueria query
 
@@ -54,17 +48,31 @@ public class LivroService {
 
         if (isbn != null){
             //query += isbn = :isbn
+            System.out.println("livro com isbn");
             specs = specs.and(LivroSpecs.isbnEqual(isbn));
         }
 
         if (titulo != null){
+            System.out.println("livro com titulo");
             specs = specs.and(LivroSpecs.tituloLike(titulo));
         }
 
         if(genero != null){
+            System.out.println("livro com genero");
             specs = specs.and(LivroSpecs.generoEqual(genero));
         }
 
-        return livroRepository.findAll(LivroSpecs.isbnEqual(isbn));
+        if(anoDePublicacao != null){
+            specs = specs.and(LivroSpecs.anoPublicacaoEqual(anoDePublicacao));
+        }
+
+        return livroRepository.findAll(specs);
+    }
+
+    public void atualizar(Livro livro){
+        if (livro.getId() == null){
+            throw new IllegalArgumentException("Para atualizar, é necessário que o livro ja´esteja salvo na base");
+        }
+        livroRepository.save(livro);
     }
 }

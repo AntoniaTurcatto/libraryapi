@@ -1,5 +1,6 @@
 package io.github.AntoniaTurcatto.libraryapi.controller;
 
+import io.github.AntoniaTurcatto.libraryapi.config.model.GeneroLivro;
 import io.github.AntoniaTurcatto.libraryapi.config.model.Livro;
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.CadastroLivroDTO;
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroRespostaDTO;
@@ -12,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -54,5 +56,38 @@ public class LivroController implements GenericController{
                 .map(livro -> {livroService.deletar(livro.getId());
                     return ResponseEntity.noContent().build();
                 }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    //isbn, titulo, nome autor, genero, ano de publicação
+    @GetMapping
+    public ResponseEntity<List<ResultadoPesquisaLivroDTO>> pesquisa(
+            @RequestParam(value = "isbn", required = false) String isbn,
+            @RequestParam(value = "titulo", required = false) String titulo,
+            @RequestParam(value = "nome-autor", required = false) String nomeAutor,
+            @RequestParam(value = "genero", required = false) GeneroLivro genero,
+            @RequestParam(value = "ano-publicacao", required = false) Integer anoDePublicacao
+    ){
+        var resultado = livroService.pesquisa(isbn, titulo, nomeAutor, genero, anoDePublicacao);
+        var lista = resultado.stream().map(livroMapper::toDTO).toList();
+        return ResponseEntity.ok(lista);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> atualizar(@PathVariable("id") String id, @RequestBody @Valid CadastroLivroDTO dto){
+        return livroService.obterPorId(UUID.fromString(id))
+            .map( livro -> {
+                Livro entidadeDoDTOAtualizada = livroMapper.toEntity(dto);
+                livro.setDataPublicacao(entidadeDoDTOAtualizada.getDataPublicacao());
+                livro.setIsbn(entidadeDoDTOAtualizada.getIsbn());
+                livro.setPreco(entidadeDoDTOAtualizada.getPreco());
+                livro.setGenero(entidadeDoDTOAtualizada.getGenero());
+                livro.setTitulo(entidadeDoDTOAtualizada.getTitulo());
+                livro.setAutor(entidadeDoDTOAtualizada.getAutor());
+
+                livroService.atualizar(livro);
+                return ResponseEntity.noContent().build();
+            }
+
+        ).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
