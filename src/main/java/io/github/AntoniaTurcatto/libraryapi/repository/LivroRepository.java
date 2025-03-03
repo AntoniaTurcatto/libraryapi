@@ -3,6 +3,8 @@ package io.github.AntoniaTurcatto.libraryapi.repository;
 import io.github.AntoniaTurcatto.libraryapi.config.model.Autor;
 import io.github.AntoniaTurcatto.libraryapi.config.model.GeneroLivro;
 import io.github.AntoniaTurcatto.libraryapi.config.model.Livro;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
@@ -13,11 +15,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface LivroRepository extends JpaRepository<Livro, UUID>, JpaSpecificationExecutor<Livro> {
 
     boolean existsByAutor(Autor autor);
+
+    boolean existsByIsbn(Livro livro);
+
+    Optional<Livro> findByIsbn(String isbn);
+
+    //Page<Livro> findByAutor(Autor autor, Pageable pageable); //uma maneira de fazer
 
     //Query Method
     //vai buscar o mapeamento (ORM) da entidade na classe livro e fazer o select

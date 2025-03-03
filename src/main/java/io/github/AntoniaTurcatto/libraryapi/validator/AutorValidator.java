@@ -34,6 +34,6 @@ public class AutorValidator {
                 ? autorOp.isPresent() //cadastro
                 : autorOp.isPresent() && autor.getId() != autorOp.get().getId();//atualizacao
         //atualizacao(se autor foi encontrado e se o autor encontrado é diferente do autor a ser atualizado
-        //senalizando o mesmo autor com id diferente, o que seria uma duplicação)
+        //sinalizando o mesmo autor com id diferente, o que seria uma duplicação)
     }
 }

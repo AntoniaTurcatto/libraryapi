@@ -2,6 +2,7 @@ package io.github.AntoniaTurcatto.libraryapi.controller.common;
 
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroCampo;
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroRespostaDTO;
+import io.github.AntoniaTurcatto.libraryapi.exceptions.CampoInvalidoException;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.RegistroDuplicadoException;
 import org.springframework.http.HttpStatus;
@@ -44,9 +45,19 @@ public class GlobalExceptionHandler {
         return ErroRespostaDTO.respostaPadrao(e.getMessage());
     }
 
+    @ExceptionHandler(CampoInvalidoException.class)
+    @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
+    public ErroRespostaDTO handleCampoInvalidoException(CampoInvalidoException e){
+        return new ErroRespostaDTO(HttpStatus.UNPROCESSABLE_ENTITY.value(),
+                "Erro de validação",
+                List.of(new ErroCampo(e.getCampo(), e.getMessage()))
+        );
+    }
+
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErroRespostaDTO handleErrosNaoTratados(RuntimeException e){
+        e.printStackTrace();
         return new ErroRespostaDTO(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                 "Ocorreu um erro inesperado. Entre em contato com a administração do sistema.",
                 List.of());
