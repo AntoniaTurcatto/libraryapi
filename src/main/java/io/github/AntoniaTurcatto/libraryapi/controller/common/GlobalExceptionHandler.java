@@ -6,6 +6,7 @@ import io.github.AntoniaTurcatto.libraryapi.exceptions.CampoInvalidoException;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.RegistroDuplicadoException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -62,4 +63,11 @@ public class GlobalExceptionHandler {
                 "Ocorreu um erro inesperado. Entre em contato com a administração do sistema.",
                 List.of());
     }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ErroRespostaDTO handleAuthorizationDeniedException(AuthorizationDeniedException e){
+        return new ErroRespostaDTO(HttpStatus.FORBIDDEN.value(), "Acesso negado", List.of());
+    }
+
 }

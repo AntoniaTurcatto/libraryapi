@@ -4,6 +4,7 @@ import io.github.AntoniaTurcatto.libraryapi.config.model.GeneroLivro;
 import io.github.AntoniaTurcatto.libraryapi.config.model.Livro;
 import io.github.AntoniaTurcatto.libraryapi.repository.LivroRepository;
 import io.github.AntoniaTurcatto.libraryapi.repository.specs.LivroSpecs;
+import io.github.AntoniaTurcatto.libraryapi.security.SecurityService;
 import io.github.AntoniaTurcatto.libraryapi.validator.LivroValidator;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,14 +21,18 @@ public class LivroService {
 
     private final LivroRepository livroRepository;
     private final LivroValidator livroValidator;
+    private final SecurityService securityService;
 
-    public LivroService(LivroRepository livroRepository, LivroValidator livroValidator){
+    public LivroService(LivroRepository livroRepository, LivroValidator livroValidator,
+                        SecurityService securityService){
         this.livroRepository= livroRepository;
         this.livroValidator = livroValidator;
+        this.securityService = securityService;
     }
 
     public Livro salvar(Livro livro){
         livroValidator.validar(livro);
+        livro.setUsuario(securityService.obterUsuarioLogado());
         return livroRepository.save(livro);
     }
 

@@ -1,16 +1,18 @@
 package io.github.AntoniaTurcatto.libraryapi.controller;
 
 import io.github.AntoniaTurcatto.libraryapi.config.model.Autor;
+import io.github.AntoniaTurcatto.libraryapi.config.model.Usuario;
 import io.github.AntoniaTurcatto.libraryapi.controller.dto.AutorDTO;
-import io.github.AntoniaTurcatto.libraryapi.controller.dto.ErroRespostaDTO;
 import io.github.AntoniaTurcatto.libraryapi.controller.mappers.AutorMapper;
-import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
-import io.github.AntoniaTurcatto.libraryapi.exceptions.RegistroDuplicadoException;
+import io.github.AntoniaTurcatto.libraryapi.security.SecurityService;
 import io.github.AntoniaTurcatto.libraryapi.service.AutorService;
+import io.github.AntoniaTurcatto.libraryapi.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
@@ -25,14 +27,18 @@ public class AutorController implements GenericController{
     private final AutorService autorService;
     private final AutorMapper mapper;
 
+
     public AutorController(AutorService autorService, AutorMapper mapper){
         this.autorService = autorService;
         this.mapper=mapper;
     }
 
     @PostMapping //@Valid = testa as anotações de validação do AutorDTO
-    public ResponseEntity<?> salvar(@RequestBody @Valid AutorDTO autorDTO){//? = coringa/wildcard
-        //var autorEntidade = autorDTO.mapearParaAutor();
+    @PreAuthorize("hasRole('GERENTE')")
+    public ResponseEntity<?> salvar(@RequestBody @Valid AutorDTO autorDTO
+                                    ){//pode colocar Authentication como argumento para auditoria de qual foi o usuario que fez a modificação
+
+
         var autorEntidade = mapper.toEntity(autorDTO);
         autorService.salvar(autorEntidade);
         //http://localhost:8080/autores/42543154365terq534
@@ -41,6 +47,7 @@ public class AutorController implements GenericController{
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<AutorDTO> obterDetalhes(@PathVariable("id") String id) { //via url
         var idAutor = UUID.fromString(id);
         //refatorando
@@ -64,6 +71,7 @@ public class AutorController implements GenericController{
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<?> deletar(@PathVariable String id){
         var idAutor = UUID.fromString(id);
         Optional<Autor> autorOp = autorService.obterPorId(idAutor);
@@ -75,6 +83,7 @@ public class AutorController implements GenericController{
     }
 
     @GetMapping//UTILIZA O VALUE PORQUE NÃO É REQUIRED E TEM MAIS DE 1
+    @PreAuthorize("hasAnyRole('OPERADOR', 'GERENTE')")
     public ResponseEntity<List<AutorDTO>> pesquisar(@RequestParam(value = "nome", required = false) String nome,
                                                     @RequestParam(value = "nacionalidade", required = false) String nacionalidade){
          List<Autor> listAutor = autorService.pesquisaByExample(nome, nacionalidade);
@@ -87,6 +96,7 @@ public class AutorController implements GenericController{
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('GERENTE')")
     public ResponseEntity<?> atualizar(@PathVariable("id") String id,
                                           @RequestBody @Valid AutorDTO dto){
         var idAutor = UUID.fromString(id);

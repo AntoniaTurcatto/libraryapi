@@ -4,6 +4,7 @@ import io.github.AntoniaTurcatto.libraryapi.config.model.Autor;
 import io.github.AntoniaTurcatto.libraryapi.exceptions.OperacaoNaoPermitidaException;
 import io.github.AntoniaTurcatto.libraryapi.repository.AutorRepository;
 import io.github.AntoniaTurcatto.libraryapi.repository.LivroRepository;
+import io.github.AntoniaTurcatto.libraryapi.security.SecurityService;
 import io.github.AntoniaTurcatto.libraryapi.validator.AutorValidator;
 import org.springframework.data.domain.Example;
 import org.springframework.data.domain.ExampleMatcher;
@@ -19,17 +20,21 @@ public class AutorService {
     private final AutorRepository autorRepository;
     private final LivroRepository livroRepository;
     private final AutorValidator autorValidator;
+    private final SecurityService securityService;
 
     public AutorService(AutorRepository autorRepository,
                         AutorValidator autorValidator,
-                        LivroRepository livroRepository){
+                        LivroRepository livroRepository,
+                        SecurityService securityService){
         this.autorRepository=autorRepository;
         this.livroRepository=livroRepository;
         this.autorValidator = autorValidator;
+        this.securityService = securityService;
     }
 
     public Autor salvar(Autor autor){
         autorValidator.validar(autor);
+        autor.setUsuario(securityService.obterUsuarioLogado());
         return autorRepository.save(autor);
     }
 

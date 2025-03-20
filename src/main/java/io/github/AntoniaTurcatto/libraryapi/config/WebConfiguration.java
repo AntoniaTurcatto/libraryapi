@@ -12,7 +12,7 @@ public class WebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        //quando acessar /login, acessará o arquivo login
+        //cria um mapeamento direto: qualquer requisição para "/login" será direcionada para a view "login".
         registry.addViewController("/login").setViewName("login");
         registry.setOrder(Ordered.HIGHEST_PRECEDENCE);//seta a view como a maior precedência na aplicação
     }
