@@ -1,7 +1,9 @@
 package io.github.AntoniaTurcatto.libraryapi.controller;
 
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller //RestController é para API, Controller é para paginas web
 public class LoginViewController {
@@ -17,5 +19,11 @@ public class LoginViewController {
     template chamado "login" (por exemplo, um arquivo login.html
     em um diretório de templates configurado).
      */
+
+    @GetMapping("/")
+    @ResponseBody//não vai esperar uma página
+    public String paginaHome(Authentication auth){
+    return "olá "+auth.getName();
+    }
 
 }

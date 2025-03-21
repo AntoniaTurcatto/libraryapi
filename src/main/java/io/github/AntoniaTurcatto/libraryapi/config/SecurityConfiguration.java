@@ -28,10 +28,10 @@ public class SecurityConfiguration {
         return http
                 .csrf(AbstractHttpConfigurer::disable)//config para aplicação web; para que a aplicação consiga fazer as requisições de forma autenticada, ela envia um token CSRF para o backend, garantindo que a página que enviou a requisição é a da aplicação
                 //.formLogin(configurer -> configurer.loginPage("/login.html").successForwardUrl("/home.html"))
-                //.formLogin(Customizer.withDefaults())//formulário padrão de login
-                .formLogin(configurer -> {
-                    configurer.loginPage("/login");
-                })
+                .formLogin(Customizer.withDefaults())
+//                .formLogin(configurer -> {
+//                    configurer.loginPage("/login");
+//                })
                 .httpBasic(Customizer.withDefaults())//definindo Http Basic
                 .authorizeHttpRequests(authorize -> {
                     //controle de requisições por ROLE e Authorities
@@ -49,6 +49,7 @@ public class SecurityConfiguration {
                     authorize.anyRequest().authenticated(); //qualquer requisição feita para a API tem que estar autenticada
                     //se eu colocar qualquer regra após o anyRequest() ele não vai atender
                 })
+                .oauth2Login(Customizer.withDefaults())
                 .build();
     }
 
