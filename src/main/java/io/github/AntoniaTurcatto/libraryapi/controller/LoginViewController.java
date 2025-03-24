@@ -23,7 +23,7 @@ public class LoginViewController {
     @GetMapping("/")
     @ResponseBody//não vai esperar uma página
     public String paginaHome(Authentication auth){
-    return "olá "+auth.getName();
+        return "olá "+auth.getName();
     }
 
 }

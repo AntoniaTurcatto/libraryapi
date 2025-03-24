@@ -25,7 +25,15 @@ create table livro(
 
 create table usuario(
     id uuid not null primary key,
-    login varchar(20) not null unique,
+    login varchar(150) not null unique,
     senha varchar(300) not null,
+	email varchar(150)not null,
     roles varchar[]
 );
+
+-- para adicionar campo email sem deletar a tabela
+ALTER TABLE usuario ADD COLUMN email VARCHAR(150) DEFAULT 'email_padrao@example.com';
+UPDATE usuario SET email = 'email_padrao@example.com' WHERE email IS NULL;
+ALTER TABLE usuario ALTER COLUMN email SET NOT NULL;
+
+ALTER TABLE usuario ALTER COLUMN login TYPE VARCHAR(150);
