@@ -63,6 +63,12 @@
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
 		</dependency>
 
+		<!--Para implementar Authorization Server dos protocolos OAUTH2-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-authorization-server</artifactId>
+		</dependency>
+
 		<!-- páginas web em aplicações spring-->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

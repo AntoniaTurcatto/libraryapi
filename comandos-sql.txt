@@ -37,3 +37,11 @@ UPDATE usuario SET email = 'email_padrao@example.com' WHERE email IS NULL;
 ALTER TABLE usuario ALTER COLUMN email SET NOT NULL;
 
 ALTER TABLE usuario ALTER COLUMN login TYPE VARCHAR(150);
+
+create table client(
+	id uuid not null primary key,
+	client_id varchar(150) not null,
+	client_secret varchar(400) not null,
+	redirect_uri varchar(200) not null,
+	scope varchar(50)
+);

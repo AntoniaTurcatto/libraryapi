@@ -17,6 +17,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
@@ -29,8 +31,6 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler successHandler) throws Exception{
         return http
                 .csrf(AbstractHttpConfigurer::disable)//config para aplicação web; para que a aplicação consiga fazer as requisições de forma autenticada, ela envia um token CSRF para o backend, garantindo que a página que enviou a requisição é a da aplicação
-                //.formLogin(configurer -> configurer.loginPage("/login.html").successForwardUrl("/home.html"))
-                //.formLogin(Customizer.withDefaults())
                 .formLogin(configurer -> {
                     configurer.loginPage("/login");
                 })
@@ -46,8 +46,6 @@ public class SecurityConfiguration {
 //                    authorize.requestMatchers(HttpMethod.GET, "/autores/**").hasAnyRole("ADMIN", "USER");
 //                    authorize.requestMatchers("/livros/**").hasAnyRole("USER", "ADMIN");
 
-
-
                     authorize.anyRequest().authenticated(); //qualquer requisição feita para a API tem que estar autenticada
                     //se eu colocar qualquer regra após o anyRequest() ele não vai atender
                 })
@@ -55,17 +53,25 @@ public class SecurityConfiguration {
                     oauth2.successHandler(successHandler);
                     oauth2.loginPage("/login");
                 })
+                .oauth2ResourceServer(oauth2RS->oauth2RS.jwt(Customizer.withDefaults()))//vou utilizar o JWT para validar o usuario
                 .build();
     }
 
-    @Bean
-    public PasswordEncoder passwordEncoder(){
-        return new BCryptPasswordEncoder(10);
-    }
-
+    //ROLE_GERENTE -> GERENTE
     @Bean
     public GrantedAuthorityDefaults grantedAuthorityDefaults(){
         return new GrantedAuthorityDefaults("");//qual prefixo queremos
+    }
+
+    //SCOPE_GERENTE -> GERENTE
+    @Bean
+    public JwtAuthenticationConverter jwtAuthenticationConverter(){
+        var authoritiesConverter = new JwtGrantedAuthoritiesConverter();
+        authoritiesConverter.setAuthorityPrefix("");
+
+        var converter = new JwtAuthenticationConverter();
+        converter.setJwtGrantedAuthoritiesConverter(authoritiesConverter);
+        return converter;
     }
 
     //@Bean --NÃO MAIS UTILIZADO
