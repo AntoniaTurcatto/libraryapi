@@ -3,6 +3,7 @@ package io.github.AntoniaTurcatto.libraryapi.controller;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller //RestController é para API, Controller é para paginas web
@@ -24,6 +25,12 @@ public class LoginViewController {
     @ResponseBody//não vai esperar uma página
     public String paginaHome(Authentication auth){
         return "olá "+auth.getName();
+    }
+
+    @GetMapping("/authorized")
+    @ResponseBody
+    public String getAuthorizationCode(@RequestParam("code") String code){
+        return "Seu authorization code: "+code;
     }
 
 }

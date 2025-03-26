@@ -1,6 +1,7 @@
 package io.github.AntoniaTurcatto.libraryapi.config;
 
 import io.github.AntoniaTurcatto.libraryapi.security.CustomUserDetailsService;
+import io.github.AntoniaTurcatto.libraryapi.security.JwtCustomAuthenticationFilter;
 import io.github.AntoniaTurcatto.libraryapi.security.LoginSocialSuccessHandler;
 import io.github.AntoniaTurcatto.libraryapi.service.UsuarioService;
 import org.springframework.context.annotation.Bean;
@@ -12,14 +13,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.core.GrantedAuthorityDefaults;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -28,7 +25,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, LoginSocialSuccessHandler successHandler) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http,
+                                                   LoginSocialSuccessHandler successHandler,
+                                                   JwtCustomAuthenticationFilter jwtCustomAuthenticationFilter) throws Exception{
         return http
                 .csrf(AbstractHttpConfigurer::disable)//config para aplicação web; para que a aplicação consiga fazer as requisições de forma autenticada, ela envia um token CSRF para o backend, garantindo que a página que enviou a requisição é a da aplicação
                 .formLogin(configurer -> {
@@ -54,6 +53,7 @@ public class SecurityConfiguration {
                     oauth2.loginPage("/login");
                 })
                 .oauth2ResourceServer(oauth2RS->oauth2RS.jwt(Customizer.withDefaults()))//vou utilizar o JWT para validar o usuario
+                .addFilterAfter(jwtCustomAuthenticationFilter, BearerTokenAuthenticationFilter.class)
                 .build();
     }
 
